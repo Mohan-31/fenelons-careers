@@ -52,27 +52,25 @@ export default function JobDetail() {
           <div>
             {/* Header */}
             <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '28px 32px', marginBottom: 20 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 20 }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 14 }}>
                 <div style={{
                   width: 56, height: 56, borderRadius: 12, flexShrink: 0,
                   background: 'linear-gradient(135deg, rgba(198,40,40,0.2), rgba(142,0,0,0.3))',
                   border: '1px solid rgba(198,40,40,0.3)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem',
                 }}>🥩</div>
-                <div>
-                  <h1 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 10 }}>{job.title}</h1>
-                  <div className="job-meta-list" style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                    {[
-                      { icon: <Briefcase size={13} />, val: job.department },
-                      { icon: <MapPin size={13} />, val: job.location },
-                      { icon: <Clock size={13} />, val: job.experience },
-                    ].filter(x => x.val).map(({ icon, val }) => (
-                      <span key={val} style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#666', fontSize: '0.84rem' }}>
-                        <span style={{ color: '#C62828' }}>{icon}</span> {val}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <h1 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' }}>{job.title}</h1>
+              </div>
+              <div className="job-meta-list" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 20 }}>
+                {[
+                  { icon: <Briefcase size={13} />, val: job.department },
+                  { icon: <MapPin size={13} />, val: job.location },
+                  { icon: <Clock size={13} />, val: job.experience },
+                ].filter(x => x.val).map(({ icon, val }) => (
+                  <span key={val} style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#666', fontSize: '0.84rem' }}>
+                    <span style={{ color: '#C62828' }}>{icon}</span> {val}
+                  </span>
+                ))}
               </div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 <span className={`badge badge-${(job.type || 'part-time').toLowerCase().replace(' ', '-')}`}>{job.type}</span>

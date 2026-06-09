@@ -73,7 +73,7 @@ if (!fs.existsSync(JOBS_FILE)) {
   writeData(JOBS_FILE, [
     {
       id: uuidv4(),
-      title: 'Butcher Assistant (Part-Time)',
+      title: 'Butcher Assistant',
       department: 'Butchery',
       location: 'Stillorgan Village Centre, Dublin, Ireland',
       type: 'Part-Time',
