@@ -273,32 +273,32 @@ app.delete('/api/admin/applications/:id', verifyAdmin, async (req, res) => {
 // ── Analytics ──────────────────────────────────────────────────────────────
 app.get('/api/admin/analytics', verifyAdmin, async (req, res) => {
   try {
-    const [jobStats]   = await sql`SELECT COUNT(*)::int AS total, SUM(CASE WHEN active THEN 1 ELSE 0 END)::int AS active FROM jobs`;
-    const [appStats]   = await sql`SELECT COUNT(*)::int AS total FROM applications`;
-    const [weeklyApps] = await sql`SELECT COUNT(*)::int AS count FROM applications WHERE applied_at > NOW() - INTERVAL '7 days'`;
-
-    const byJob = await sql`
-      SELECT COALESCE(job_title, 'Unknown') AS name, COUNT(*)::int AS count
-      FROM applications GROUP BY job_title ORDER BY count DESC LIMIT 8
-    `;
-
-    const trend = await sql`
-      SELECT TO_CHAR(d::date, 'Dy') AS date, COUNT(a.id)::int AS count
-      FROM generate_series(NOW() - INTERVAL '6 days', NOW(), '1 day') d
-      LEFT JOIN applications a ON DATE(a.applied_at) = d::date
-      GROUP BY d ORDER BY d
-    `;
-
-    const [sb] = await sql`
-      SELECT
-        SUM(CASE WHEN status = 'pending'     THEN 1 ELSE 0 END)::int AS pending,
-        SUM(CASE WHEN status = 'reviewed'    THEN 1 ELSE 0 END)::int AS reviewed,
-        SUM(CASE WHEN status = 'shortlisted' THEN 1 ELSE 0 END)::int AS shortlisted,
-        SUM(CASE WHEN status = 'rejected'    THEN 1 ELSE 0 END)::int AS rejected
-      FROM applications
-    `;
-
-    const recentApps = await sql`SELECT * FROM applications ORDER BY applied_at DESC LIMIT 5`;
+    const [
+      [jobStats],
+      [appStats],
+      [weeklyApps],
+      byJob,
+      trend,
+      [sb],
+      recentApps,
+    ] = await Promise.all([
+      sql`SELECT COUNT(*)::int AS total, SUM(CASE WHEN active THEN 1 ELSE 0 END)::int AS active FROM jobs`,
+      sql`SELECT COUNT(*)::int AS total FROM applications`,
+      sql`SELECT COUNT(*)::int AS count FROM applications WHERE applied_at > NOW() - INTERVAL '7 days'`,
+      sql`SELECT COALESCE(job_title, 'Unknown') AS name, COUNT(*)::int AS count
+          FROM applications GROUP BY job_title ORDER BY count DESC LIMIT 8`,
+      sql`SELECT TO_CHAR(d::date, 'Dy') AS date, COUNT(a.id)::int AS count
+          FROM generate_series(NOW() - INTERVAL '6 days', NOW(), '1 day') d
+          LEFT JOIN applications a ON DATE(a.applied_at) = d::date
+          GROUP BY d ORDER BY d`,
+      sql`SELECT
+            SUM(CASE WHEN status = 'pending'     THEN 1 ELSE 0 END)::int AS pending,
+            SUM(CASE WHEN status = 'reviewed'    THEN 1 ELSE 0 END)::int AS reviewed,
+            SUM(CASE WHEN status = 'shortlisted' THEN 1 ELSE 0 END)::int AS shortlisted,
+            SUM(CASE WHEN status = 'rejected'    THEN 1 ELSE 0 END)::int AS rejected
+          FROM applications`,
+      sql`SELECT * FROM applications ORDER BY applied_at DESC LIMIT 5`,
+    ]);
 
     res.json({
       totalJobs: jobStats.total,

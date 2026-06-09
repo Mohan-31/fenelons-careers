@@ -37,10 +37,16 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/admin/analytics')
-      .then(r => setAnalytics(r.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const token = localStorage.getItem('adminToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const attempt = (tries) =>
+      axios.get('/api/admin/analytics', { headers })
+        .then(r => setAnalytics(r.data))
+        .catch(() => {
+          if (tries > 1) return new Promise(res => setTimeout(res, 1500)).then(() => attempt(tries - 1));
+        })
+        .finally(() => setLoading(false));
+    attempt(3);
   }, []);
 
   return (

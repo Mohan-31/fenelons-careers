@@ -106,10 +106,16 @@ export default function AdminApplications() {
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   useEffect(() => {
-    axios.get('/api/admin/applications')
-      .then(r => setApplications(r.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const token = localStorage.getItem('adminToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const attempt = (tries) =>
+      axios.get('/api/admin/applications', { headers })
+        .then(r => setApplications(r.data))
+        .catch(() => {
+          if (tries > 1) return new Promise(res => setTimeout(res, 1500)).then(() => attempt(tries - 1));
+        })
+        .finally(() => setLoading(false));
+    attempt(3);
   }, []);
 
   const handleStatusChange = async (id, status) => {
