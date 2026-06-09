@@ -39,13 +39,6 @@ export default function JobDetail() {
 
   return (
     <div style={{ padding: '48px 0 80px' }}>
-      <style>{`
-        @media (max-width: 768px) {
-          .job-detail-grid { grid-template-columns: 1fr !important; }
-          .job-apply-card { position: static !important; }
-          .job-meta-list { flex-direction: column !important; gap: 10px !important; align-items: flex-start !important; }
-        }
-      `}</style>
       <div className="page-container">
         <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#666', fontSize: '0.88rem', marginBottom: 32, transition: 'color 0.2s' }}
           onMouseEnter={e => e.currentTarget.style.color = '#EF5350'}

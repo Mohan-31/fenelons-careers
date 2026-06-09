@@ -323,6 +323,15 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .form-row { grid-template-columns: 1fr; }
   .admin-main .page-header { padding-left: 56px; }
 }
+@media (max-width: 768px) {
+  .job-detail-grid { grid-template-columns: 1fr !important; }
+  .job-apply-card { position: static !important; }
+  .job-meta-list {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+  }
+}
 @media (max-width: 600px) {
   .page-header { flex-direction: column; align-items: flex-start; }
   .admin-main .page-header { padding-left: 52px; }
