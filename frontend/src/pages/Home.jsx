@@ -109,12 +109,26 @@ export default function Home() {
         .hero-img-wrap.loaded { animation: fadeUp 0.9s ease forwards, floatImg 5s ease-in-out 1s infinite; }
         .about-img { opacity: 0; }
         .about-img.loaded { animation: fadeUp 0.9s ease forwards; }
-        @media (max-width: 768px) {
+
+        /* ── Hero grid: 3-area (text-top | image | text-bottom) ── */
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 56px;
+        }
+        .hero-text-before { grid-column: 1; grid-row: 1; align-self: end; padding-bottom: 32px; }
+        .hero-img-col     { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; }
+        .hero-text-after  { grid-column: 1; grid-row: 2; align-self: start; }
+
+        @media (max-width: 900px) {
           .hero-section-wrap { padding: 44px 20px !important; min-height: 0 !important; }
-          .hero-text { text-align: left !important; align-items: flex-start !important; }
-          .hero-stats { justify-content: flex-start !important; gap: 20px !important; }
-          .about-grid { grid-template-columns: 1fr !important; }
-          .section-pad { padding: 52px 0 !important; }
+          .hero-grid { grid-template-columns: 1fr !important; column-gap: 0 !important; }
+          .hero-text-before { grid-column: 1 !important; grid-row: 1 !important; padding-bottom: 0 !important; align-self: auto !important; }
+          .hero-img-col     { grid-column: 1 !important; grid-row: 2 !important; margin: 28px 0 !important; justify-content: flex-start !important; align-self: auto !important; }
+          .hero-text-after  { grid-column: 1 !important; grid-row: 3 !important; align-self: auto !important; }
+          .hero-stats       { justify-content: flex-start !important; gap: 20px !important; }
+          .about-grid       { grid-template-columns: 1fr !important; }
+          .section-pad      { padding: 52px 0 !important; }
         }
         @media (max-width: 480px) {
           .hero-section-wrap { padding: 36px 16px !important; }
@@ -131,69 +145,73 @@ export default function Home() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 35%, rgba(198,40,40,0.1) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 60% 40%, rgba(198,40,40,0.12) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
         <div className="page-container hero-section-wrap" style={{ position: 'relative', zIndex: 1, padding: '72px 24px', width: '100%' }}>
-          <div className="hero-text" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: 680, margin: '0 auto' }}>
+          <div className="hero-grid">
 
-            {/* Now Hiring badge */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'rgba(198,40,40,0.1)', border: '1px solid rgba(198,40,40,0.3)',
-              borderRadius: 20, padding: '6px 16px', marginBottom: 24,
-            }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#EF5350', animation: 'pulse 2s infinite' }} />
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#EF5350', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-                Now Hiring
-              </span>
+            {/* Left col – top: badge + heading + description */}
+            <div className="hero-text-before">
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: 'rgba(198,40,40,0.1)', border: '1px solid rgba(198,40,40,0.3)',
+                borderRadius: 20, padding: '6px 16px', marginBottom: 24,
+              }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#EF5350', animation: 'pulse 2s infinite' }} />
+                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#EF5350', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+                  Now Hiring
+                </span>
+              </div>
+
+              <h1 style={{ fontSize: 'clamp(2.4rem, 4.5vw, 3.6rem)', fontWeight: 900, lineHeight: 1.08, letterSpacing: '-1.5px', marginBottom: 20 }}>
+                Join the{' '}
+                <span style={{ background: 'linear-gradient(135deg, #EF5350, #C62828)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  Fenelons
+                </span>{' '}Family
+              </h1>
+
+              <p style={{ fontSize: '1rem', color: '#999', lineHeight: 1.8, maxWidth: 480 }}>
+                One of Dublin's most trusted butcher shops, proudly serving the community from Stillorgan Village Centre for over 70 years. Recognised as{' '}
+                <strong style={{ color: '#EF5350' }}>Ireland's Best Butcher Shop</strong>{' '}
+                at the Associated Craft Butchers of Ireland Star Shop Awards.
+              </p>
             </div>
 
-            {/* Heading */}
-            <h1 style={{ fontSize: 'clamp(2.4rem, 5vw, 3.8rem)', fontWeight: 900, lineHeight: 1.08, letterSpacing: '-1.5px', marginBottom: 20 }}>
-              Join the{' '}
-              <span style={{ background: 'linear-gradient(135deg, #EF5350, #C62828)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Fenelons
-              </span>{' '}Family
-            </h1>
-
-            {/* Description */}
-            <p style={{ fontSize: '1rem', color: '#999', lineHeight: 1.8, maxWidth: 580 }}>
-              One of Dublin's most trusted butcher shops, proudly serving the community from Stillorgan Village Centre for over 70 years. Recognised as{' '}
-              <strong style={{ color: '#EF5350' }}>Ireland's Best Butcher Shop</strong>{' '}
-              at the Associated Craft Butchers of Ireland Star Shop Awards.
-            </p>
-
-            {/* Hero image - plain with float animation, no background overlay */}
-            <div
-              className={`hero-img-wrap${heroLoaded ? ' loaded' : ''}`}
-              style={{ maxWidth: 540, width: '100%', margin: '36px auto 0' }}
-            >
-              <img
-                src="/hero-image.png"
-                alt="Fenelons Butchers team"
-                onLoad={() => setHeroLoaded(true)}
-                style={{ width: '100%', borderRadius: 18, display: 'block' }}
-              />
+            {/* Right col: image (spans both rows on desktop, middle row on mobile) */}
+            <div className="hero-img-col">
+              <div
+                className={`hero-img-wrap${heroLoaded ? ' loaded' : ''}`}
+                style={{ maxWidth: 500, width: '100%' }}
+              >
+                <img
+                  src="/hero-image.png"
+                  alt="Fenelons Butchers team"
+                  onLoad={() => setHeroLoaded(true)}
+                  style={{ width: '100%', borderRadius: 18, display: 'block' }}
+                />
+              </div>
             </div>
 
-            {/* CTA */}
-            <a href="#jobs" className="btn btn-primary btn-lg" style={{ marginTop: 36, marginBottom: 32 }}>
-              Open Roles <ChevronRight size={18} />
-            </a>
+            {/* Left col – bottom: CTA + stats */}
+            <div className="hero-text-after">
+              <a href="#jobs" className="btn btn-primary btn-lg" style={{ marginBottom: 32 }}>
+                Open Roles <ChevronRight size={18} />
+              </a>
 
-            {/* Stats */}
-            <div className="hero-stats" style={{ display: 'flex', gap: 36, flexWrap: 'wrap', justifyContent: 'center' }}>
-              {[
-                { icon: <Trophy size={17} />, label: '70+ Years Legacy' },
-                { icon: <Users size={17} />, label: '10+ Team Members' },
-                { icon: <Star size={17} />, label: '4.4★ Rated' },
-              ].map(({ icon, label }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#666', fontSize: '0.88rem', fontWeight: 500 }}>
-                  <span style={{ color: '#C62828' }}>{icon}</span>
-                  {label}
-                </div>
-              ))}
+              <div className="hero-stats" style={{ display: 'flex', gap: 36, flexWrap: 'wrap' }}>
+                {[
+                  { icon: <Trophy size={17} />, label: '70+ Years Legacy' },
+                  { icon: <Users size={17} />, label: '10+ Team Members' },
+                  { icon: <Star size={17} />, label: '4.4★ Rated' },
+                ].map(({ icon, label }) => (
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#666', fontSize: '0.88rem', fontWeight: 500 }}>
+                    <span style={{ color: '#C62828' }}>{icon}</span>
+                    {label}
+                  </div>
+                ))}
+              </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -232,7 +250,6 @@ export default function Home() {
       {/* ── About Us ── */}
       <section className="section-pad" style={{ padding: '72px 0', background: '#0a0a0a' }}>
         <div className="page-container">
-          {/* Heading at top */}
           <div style={{ marginBottom: 36 }}>
             <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#C62828', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 12 }}>
               Our Story
@@ -242,7 +259,6 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Image + content */}
           <div className="about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 52, alignItems: 'start' }}>
             <div>
               <img

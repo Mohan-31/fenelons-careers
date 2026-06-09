@@ -43,6 +43,7 @@ export default function JobDetail() {
         @media (max-width: 768px) {
           .job-detail-grid { grid-template-columns: 1fr !important; }
           .job-apply-card { position: static !important; }
+          .job-meta-list { flex-direction: column !important; gap: 10px !important; align-items: flex-start !important; }
         }
       `}</style>
       <div className="page-container">
@@ -67,7 +68,7 @@ export default function JobDetail() {
                 }}>🥩</div>
                 <div>
                   <h1 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 10 }}>{job.title}</h1>
-                  <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                  <div className="job-meta-list" style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
                     {[
                       { icon: <Briefcase size={13} />, val: job.department },
                       { icon: <MapPin size={13} />, val: job.location },
