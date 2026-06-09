@@ -322,6 +322,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .admin-main { margin-left: 0 !important; padding: 20px 16px !important; }
   .form-row { grid-template-columns: 1fr; }
   .admin-main .page-header { padding-left: 56px; }
+  .admin-charts-grid { grid-template-columns: 1fr !important; }
+  .admin-status-grid { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 768px) {
   .job-detail-grid { grid-template-columns: 1fr !important; }
@@ -338,4 +340,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .modal { padding: 24px 18px; }
   .table-wrap { font-size: 0.82rem; }
   th, td { padding: 10px 12px; }
+  .admin-filters { flex-direction: column; }
+  .admin-filters > * { width: 100% !important; flex: unset !important; }
 }

@@ -158,16 +158,16 @@ export default function AdminApplications() {
         </div>
 
         {/* Filters */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative' }}>
+        <div className="admin-filters" style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: '1 1 200px' }}>
             <Search size={14} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#444', pointerEvents: 'none' }} />
-            <input className="input" style={{ paddingLeft: 34, width: 220 }} placeholder="Search by name/email…" value={search} onChange={e => setSearch(e.target.value)} />
+            <input className="input" style={{ paddingLeft: 34, width: '100%' }} placeholder="Search by name/email…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <select className="input" style={{ width: 160 }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          <select className="input" style={{ flex: '1 1 140px' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">All Statuses</option>
             {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
           </select>
-          <select className="input" style={{ width: 200 }} value={filterJob} onChange={e => setFilterJob(e.target.value)}>
+          <select className="input" style={{ flex: '1 1 160px' }} value={filterJob} onChange={e => setFilterJob(e.target.value)}>
             <option value="">All Positions</option>
             {jobs.map(j => <option key={j} value={j}>{j}</option>)}
           </select>

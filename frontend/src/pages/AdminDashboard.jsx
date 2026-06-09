@@ -73,7 +73,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Charts row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+            <div className="admin-charts-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
               {/* Trend chart */}
               <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: 24 }}>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#555', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 4 }}>
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Status breakdown + Recent */}
-            <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20 }}>
+            <div className="admin-status-grid" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20 }}>
               {/* Status cards */}
               <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: 24 }}>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#555', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 20 }}>
