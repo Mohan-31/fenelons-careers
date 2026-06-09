@@ -7,6 +7,7 @@ backend/data/
 .env
 .env.local
 .env.production
+backend/.env
 *.log
 .DS_Store
 Thumbs.db
