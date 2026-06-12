@@ -2,19 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const { neon } = require('@neondatabase/serverless');
-const { put } = require('@vercel/blob');
 
 require('dotenv').config();
 
 const app = express();
 const PORT = 5000;
-
-const IS_VERCEL = !!process.env.VERCEL;
-const uploadDir = path.join(__dirname, 'uploads');
-
-if (!IS_VERCEL && !fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -60,10 +53,14 @@ async function initDb() {
       cover_letter         TEXT,
       resume_file          TEXT,
       resume_original_name TEXT,
+      resume_data          TEXT,
+      resume_mimetype      TEXT,
       applied_at           TIMESTAMPTZ DEFAULT NOW(),
       status               TEXT DEFAULT 'pending'
     )
   `;
+  await sql`ALTER TABLE applications ADD COLUMN IF NOT EXISTS resume_data TEXT`;
+  await sql`ALTER TABLE applications ADD COLUMN IF NOT EXISTS resume_mimetype TEXT`;
 
   const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM jobs`;
   if (count === 0) {
@@ -151,21 +148,14 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 // ── File upload ────────────────────────────────────────────────────────────
-const storage = IS_VERCEL
-  ? multer.memoryStorage()
-  : multer.diskStorage({
-      destination: (req, file, cb) => cb(null, uploadDir),
-      filename: (req, file, cb) => cb(null, `resume_${Date.now()}${path.extname(file.originalname)}`),
-    });
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['.pdf', '.doc', '.docx'];
     allowed.includes(path.extname(file.originalname).toLowerCase()) ? cb(null, true) : cb(new Error('Only PDF and Word documents are allowed'));
   },
 });
-if (!IS_VERCEL) app.use('/uploads', express.static(uploadDir));
 
 // ── Public Jobs ────────────────────────────────────────────────────────────
 app.get('/api/jobs', async (req, res) => {
@@ -239,34 +229,34 @@ app.delete('/api/admin/jobs/:id', verifyAdmin, async (req, res) => {
 app.post('/api/applications', upload.single('resume'), async (req, res) => {
   try {
     const { name, email, phone, coverLetter, jobId, jobTitle } = req.body;
-    let resumeFile = null;
     const resumeOriginalName = req.file?.originalname || null;
-
-    if (req.file) {
-      if (IS_VERCEL) {
-        const ext = path.extname(req.file.originalname);
-        const blobName = `resumes/resume_${Date.now()}${ext}`;
-        const blob = await put(blobName, req.file.buffer, {
-          access: 'public',
-          contentType: req.file.mimetype,
-        });
-        resumeFile = blob.url;
-      } else {
-        resumeFile = `/uploads/${req.file.filename}`;
-      }
-    }
+    const resumeFile = resumeOriginalName;
+    const resumeData = req.file ? req.file.buffer.toString('base64') : null;
+    const resumeMimetype = req.file?.mimetype || null;
 
     await sql`
-      INSERT INTO applications (job_id, job_title, name, email, phone, cover_letter, resume_file, resume_original_name)
-      VALUES (${jobId || null}, ${jobTitle || null}, ${name}, ${email}, ${phone || null}, ${coverLetter || null}, ${resumeFile}, ${resumeOriginalName})
+      INSERT INTO applications (job_id, job_title, name, email, phone, cover_letter, resume_file, resume_original_name, resume_data, resume_mimetype)
+      VALUES (${jobId || null}, ${jobTitle || null}, ${name}, ${email}, ${phone || null}, ${coverLetter || null}, ${resumeFile}, ${resumeOriginalName}, ${resumeData}, ${resumeMimetype})
     `;
     res.json({ success: true, message: 'Application submitted successfully!' });
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+app.get('/api/admin/applications/:id/resume', verifyAdmin, async (req, res) => {
+  try {
+    const rows = await sql`SELECT resume_data, resume_mimetype, resume_original_name FROM applications WHERE id = ${req.params.id}`;
+    if (!rows.length || !rows[0].resume_data) return res.status(404).json({ message: 'Resume not found' });
+    const { resume_data, resume_mimetype, resume_original_name } = rows[0];
+    const buffer = Buffer.from(resume_data, 'base64');
+    res.setHeader('Content-Type', resume_mimetype || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${resume_original_name || 'resume'}"`);
+    res.send(buffer);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
 app.get('/api/admin/applications', verifyAdmin, async (req, res) => {
   try {
-    const rows = await sql`SELECT * FROM applications ORDER BY applied_at DESC`;
+    const rows = await sql`SELECT id, job_id, job_title, name, email, phone, cover_letter, resume_file, resume_original_name, resume_mimetype, applied_at, status FROM applications ORDER BY applied_at DESC`;
     res.json(rows.map(toCamel));
   } catch (err) { res.status(500).json({ message: err.message }); }
 });

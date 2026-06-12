@@ -77,16 +77,13 @@ function AppDetailModal({ app, onClose, onStatusChange }) {
             <StatusSelect value={app.status || 'pending'} onChange={status => onStatusChange(app.id, status)} />
           </div>
           {app.resumeFile && (
-            <a
-              href={app.resumeFile?.startsWith('http') ? app.resumeFile : `/uploads/${app.resumeFile}`}
-              download={app.resumeOriginalName || 'resume'}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={e => { e.stopPropagation(); handleDownload(app); }}
               className="btn btn-primary btn-sm"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
               <Download size={14} /> Download Resume
-            </a>
+            </button>
           )}
         </div>
       </div>
@@ -135,6 +132,23 @@ export default function AdminApplications() {
       if (selectedApp?.id === id) setSelectedApp(null);
       showToast('Application deleted.');
     } catch {}
+  };
+
+  const handleDownload = async (app) => {
+    try {
+      const token = localStorage.getItem('adminToken') || 'fenelons-admin-secure-token-2024';
+      const res = await fetch(`/api/admin/applications/${app.id}/resume`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) { alert('Resume not available.'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = app.resumeOriginalName || 'resume';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch { alert('Failed to download resume.'); }
   };
 
   const jobs = [...new Set(applications.map(a => a.jobTitle).filter(Boolean))];
@@ -234,12 +248,12 @@ export default function AdminApplications() {
                     </td>
                     <td>
                       {app.resumeFile ? (
-                        <a href={app.resumeFile?.startsWith('http') ? app.resumeFile : `/uploads/${app.resumeFile}`} download={app.resumeOriginalName} target="_blank" rel="noreferrer"
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#EF5350', fontSize: '0.82rem', fontWeight: 600 }}
-                          onClick={e => e.stopPropagation()}
+                        <button
+                          onClick={e => { e.stopPropagation(); handleDownload(app); }}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#EF5350', fontSize: '0.82rem', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                         >
                           <Download size={13} /> {app.resumeOriginalName?.substring(0, 18) || 'Resume'}
-                        </a>
+                        </button>
                       ) : (
                         <span style={{ color: '#444', fontSize: '0.82rem' }}>No file</span>
                       )}
