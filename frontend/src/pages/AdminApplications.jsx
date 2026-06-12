@@ -78,7 +78,7 @@ function AppDetailModal({ app, onClose, onStatusChange }) {
           </div>
           {app.resumeFile && (
             <a
-              href={`/uploads/${app.resumeFile}`}
+              href={app.resumeFile?.startsWith('http') ? app.resumeFile : `/uploads/${app.resumeFile}`}
               download={app.resumeOriginalName || 'resume'}
               target="_blank"
               rel="noreferrer"
@@ -234,7 +234,7 @@ export default function AdminApplications() {
                     </td>
                     <td>
                       {app.resumeFile ? (
-                        <a href={`/uploads/${app.resumeFile}`} download={app.resumeOriginalName} target="_blank" rel="noreferrer"
+                        <a href={app.resumeFile?.startsWith('http') ? app.resumeFile : `/uploads/${app.resumeFile}`} download={app.resumeOriginalName} target="_blank" rel="noreferrer"
                           style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#EF5350', fontSize: '0.82rem', fontWeight: 600 }}
                           onClick={e => e.stopPropagation()}
                         >

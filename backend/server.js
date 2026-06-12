@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { neon } = require('@neondatabase/serverless');
+const { put } = require('@vercel/blob');
 
 require('dotenv').config();
 
@@ -11,9 +12,9 @@ const app = express();
 const PORT = 5000;
 
 const IS_VERCEL = !!process.env.VERCEL;
-const uploadDir = IS_VERCEL ? '/tmp/fenelons-uploads' : path.join(__dirname, 'uploads');
+const uploadDir = path.join(__dirname, 'uploads');
 
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+if (!IS_VERCEL && !fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -150,10 +151,12 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 // ── File upload ────────────────────────────────────────────────────────────
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, `resume_${Date.now()}${path.extname(file.originalname)}`),
-});
+const storage = IS_VERCEL
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (req, file, cb) => cb(null, uploadDir),
+      filename: (req, file, cb) => cb(null, `resume_${Date.now()}${path.extname(file.originalname)}`),
+    });
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
@@ -162,7 +165,7 @@ const upload = multer({
     allowed.includes(path.extname(file.originalname).toLowerCase()) ? cb(null, true) : cb(new Error('Only PDF and Word documents are allowed'));
   },
 });
-app.use('/uploads', express.static(uploadDir));
+if (!IS_VERCEL) app.use('/uploads', express.static(uploadDir));
 
 // ── Public Jobs ────────────────────────────────────────────────────────────
 app.get('/api/jobs', async (req, res) => {
@@ -236,8 +239,23 @@ app.delete('/api/admin/jobs/:id', verifyAdmin, async (req, res) => {
 app.post('/api/applications', upload.single('resume'), async (req, res) => {
   try {
     const { name, email, phone, coverLetter, jobId, jobTitle } = req.body;
-    const resumeFile = req.file?.filename || null;
+    let resumeFile = null;
     const resumeOriginalName = req.file?.originalname || null;
+
+    if (req.file) {
+      if (IS_VERCEL) {
+        const ext = path.extname(req.file.originalname);
+        const blobName = `resumes/resume_${Date.now()}${ext}`;
+        const blob = await put(blobName, req.file.buffer, {
+          access: 'public',
+          contentType: req.file.mimetype,
+        });
+        resumeFile = blob.url;
+      } else {
+        resumeFile = `/uploads/${req.file.filename}`;
+      }
+    }
+
     await sql`
       INSERT INTO applications (job_id, job_title, name, email, phone, cover_letter, resume_file, resume_original_name)
       VALUES (${jobId || null}, ${jobTitle || null}, ${name}, ${email}, ${phone || null}, ${coverLetter || null}, ${resumeFile}, ${resumeOriginalName})
